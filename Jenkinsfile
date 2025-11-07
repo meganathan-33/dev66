@@ -1,46 +1,43 @@
 pipeline {
     agent any
-
     tools {
-        maven 'maven-3.9.11'
-        jdk 'jdk-17'
+        jdk "jdk-17"
     }
 
     stages {
         stage('Checkout Code') {
             steps {
-                git branch: 'main', url: 'https://github.com/meganathan-33/dev66.git'
+                git branch: 'main',
+                    url: 'https://github.com/meganathan-33/dev66.git'
             }
         }
 
         stage('Build') {
             steps {
-                bat 'mvn clean compile'
+                bat "./gradlew clean build"
             }
         }
 
         stage('Test') {
             steps {
-                bat 'mvn test'
+                bat "./gradlew test"
             }
         }
 
         stage('Package') {
             steps {
-                bat 'mvn package'
+                echo "✅ Build and test completed successfully!"
+                archiveArtifacts artifacts: 'build/libs/*.jar', fingerprint: true
             }
         }
     }
 
     post {
-        always {
-            archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
-        }
         success {
-            echo '✅ Pipeline Success!'
+            echo "✅ Pipeline Success!"
         }
         failure {
-            echo '❌ Pipeline Failed!'
+            echo "❌ Pipeline Failed!"
         }
     }
 }
